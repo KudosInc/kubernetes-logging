@@ -44,7 +44,25 @@ data:
         Merge_JSON_Log      Off
         K8S-Logging.Exclude On
         K8S-Logging.Parser  On
-         
+
+    #######################################
+    # Begin Kudos specific configuration
+    # Excludes low value / noisy log statements to reduce New Relic logging costs
+    [FILTER]
+        Name         nest
+        Match        *
+        Operation    lift
+        Nested_under kubernetes
+
+    [FILTER]
+        Name          grep
+        Match         *
+        Exclude       namespace_name kube-system
+        Exclude       container_name external-dns|datadog|sidekiq-monitor
+        Exclude       log GraphQL::Client::Response
+        Exclude       log /api/v1/health_check|GET /health         
+    # End Kudos specific configuration
+    #######################################
   output-newrelic.conf: |
     [OUTPUT]
         Name  newrelic
